@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { connectDatabase } from './config/db.js';
 import authRoutes from './routes/auth.routes.js';
 import taskRoutes from './routes/task.routes.js';
+import userRoutes from "./routes/user.routes.js";
 
 dotenv.config();
 
@@ -26,6 +27,8 @@ app.get('/api/health', (req, res) => {
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/users', userRoutes);
+
 
 // Start server
 const startServer = async () => {
@@ -33,10 +36,10 @@ const startServer = async () => {
     await connectDatabase();
     
     app.listen(PORT, () => {
-      console.log(`\n🚀 Server running on http://localhost:${PORT}`);
-      console.log(`📡 API Health: http://localhost:${PORT}/api/health`);
-      console.log(`🗄️  Database: PostgreSQL`);
-      console.log(`\n📝 Available Endpoints:`);
+      console.log(`\n Server running on http://localhost:${PORT}`);
+      console.log(` API Health: http://localhost:${PORT}/api/health`);
+      console.log(`  Database: PostgreSQL`);
+      console.log(`\n Available Endpoints:`);
       console.log(`   POST   /api/auth/login`);
       console.log(`   GET    /api/tasks`);
       console.log(`   GET    /api/tasks/:id`);
@@ -46,7 +49,7 @@ const startServer = async () => {
       console.log(`   DELETE /api/tasks/:id\n`);
     });
   } catch (error) {
-    console.error('❌ Failed to start server:', error);
+    console.error(' Failed to start server:', error);
     process.exit(1);
   }
 };
