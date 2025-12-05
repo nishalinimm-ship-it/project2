@@ -1,0 +1,243 @@
+<div class="main-layout">
+  <!-- sidebar -->
+  <aside class="sidebar" >
+    <div class="sidebar-header">
+      <h2>Task Manager</h2>
+    </div>
+    <nav>
+    <ul>
+      <li><a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <i class="pi pi-home"></i>
+        <span>Dashboard</span>
+      </a></li>
+      <li><a routerLink="/tasks" routerLinkActive="active">
+        <i class="pi pi-list"></i>
+        <span> View All Tasks</span> 
+      </a></li>
+    </ul>
+    </nav>
+  </aside>
+
+  <!-- Main content -->
+<div class="main-content">
+  <!-- header -->
+  <div class="header">
+    <div class="header-content">
+      <h1>Task Directory</h1>
+      <div class="user-info">
+        <div class ="user-profile">
+          <i class="pi pi-shield user-icon"></i>
+        <span class="user-name">{{ authService.currentUser()?.name }}</span>
+        </div>
+        <button (click)="logout()" class="btn-logout">
+            <i class="pi pi-user user-icon"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+
+<!-- <div class="task-list-container">
+
+  HEADER -->
+  <!-- <div class="header">
+    <div class="header-content">
+      <h1>Task Management</h1>
+
+      <div class="header-actions">
+        <button (click)="navigateToDashboard()" class="btn-dashboard">Dashboard</button>
+        <span class="user-name">{{ authService.currentUser()?.name }}</span>
+        <button (click)="logout()" class="btn-logout">Logout</button>
+      </div>
+    </div>
+  </div> -->
+
+  <div class="container">
+
+    <!-- SEARCH + FILTERS -->
+    <div class="controls">
+      <div class="search-filter">
+
+        <!-- SEARCH INPUT -->
+        <input  
+          type="text"
+          placeholder="Search tasks..."
+          [value]="searchQuery()"
+          (input)="searchQuery.set(searchBox.value)"
+          #searchBox
+          class="search-input"
+        />
+
+        <!-- STATUS FILTER -->
+        <select
+          #statusSel
+          [value]="filterStatus()"
+          (change)="filterStatus.set(statusSel.value)"
+          class="filter-select"
+        >
+          <option value="All">All Status</option>
+          <option value="Pending">Pending</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+        </select>
+
+        <!-- PRIORITY FILTER -->
+        <select
+          #prioritySel
+          [value]="filterPriority()"
+          (change)="filterPriority.set(prioritySel.value)"
+          class="filter-select"
+        >
+          <option value="All">All Priority</option>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
+      </div>
+
+      <button (click)="openAddForm()" class="btn-add">
+        + Add New Task
+      </button>
+    </div>
+
+    <!-- ADD / EDIT FORM -->
+    @if (showForm()) {
+      <app-task-form
+        [task]="editingTask()"
+        (close)="closeForm()">
+      </app-task-form>
+    }
+
+    <!-- TASK TABLE -->
+    <div class="tasks-table">
+
+      @if (filteredTasks.length === 0) {
+        <div class="no-tasks">
+          <p>No tasks found</p>
+        </div>
+      } @else {
+
+        <table>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Priority</th>
+              <th>Status</th>
+              <th>Due Date</th>
+              <th>Assigned To</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (task of paginatedTasks; track task.id) {
+              <tr>
+
+                <!-- TITLE -->
+                <td>
+                  <div class="task-title">
+                    <strong>{{ task.title }}</strong>
+                    @if (task.description) {
+                      <small>{{ task.description }}</small>
+                    }
+                  </div>
+                </td>
+
+                <!-- PRIORITY BADGE -->
+                <td>
+                  <span class="badge" [ngClass]="getPriorityClass(task.priority)">
+                    {{ task.priority }}
+                  </span>
+                </td>
+
+                <!-- STATUS DROPDOWN -->
+                <td>
+                  <select
+                    #status
+                    [value]="task.status"
+                    (change)="updateStatus(task.id!, status.value)"
+                    class="status-select"
+                    [ngClass]="getStatusClass(task.status)"
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                  </select>
+                </td>
+
+                <!-- DUE DATE -->
+                <td>
+                  @if (task.dueDate) {
+                    {{ task.dueDate | date:'MMM dd, yyyy' }}
+                  } @else {
+                    <span class="no-date">No due date</span>
+                  }
+                </td>
+
+                <!-- ASSIGNED USER -->
+                <td>
+                  {{ task.assignedUser?.name || 'Unassigned' }}
+                </td>
+
+                <!-- ACTION BUTTONS -->
+                <td>
+                  <div class="action-buttons">
+                    <button
+                      (click)="openEditForm(task)"
+                      class="btn-edit"
+                      title="Edit Task">
+                    <i class="pi pi-pencil"></i>
+                    </button>
+
+                    <button
+                      (click)="deleteTask(task.id!)"
+                      class="btn-delete"
+                      title="Delete Task"><i class="pi pi-ban"></i>
+                    </button>
+                  </div>
+                </td>
+
+              </tr>
+            }
+          </tbody>
+        </table>
+         <!-- 📌 PAGINATION CONTROLS -->
+          <div class="pagination">
+            <div class="pagination-info">
+              Showing {{ (currentPage() - 1) * itemsPerPage() + 1 }} 
+              to {{ Math.min(currentPage() * itemsPerPage(), filteredTasks.length) }} 
+              of {{ filteredTasks.length }} tasks
+            </div>
+
+            <div class="pagination-controls">
+              <button
+                (click)="previousPage()"
+                [disabled]="currentPage() === 1"
+                class="pagination-btn">
+                <i class="pi pi-chevron-left"></i>
+              </button>
+
+              @for (pageNum of pageNumbers; track pageNum) {
+                <button
+                  (click)="goToPage(pageNum)"
+                  [class.active]="currentPage() === pageNum"
+                  class="pagination-btn page-number">
+                  {{ pageNum }}
+                </button>
+              }
+
+              <button
+                (click)="nextPage()"
+                [disabled]="currentPage() === totalPages"
+                class="pagination-btn">
+                <i class="pi pi-chevron-right"></i>
+              </button>
+               </div>
+          </div>
+      }
+      
+    </div>
+  </div>
+</div>
+</div>

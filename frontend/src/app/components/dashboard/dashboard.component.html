@@ -1,0 +1,136 @@
+<div class="main-layout">
+  <!-- sidebar -->
+  <aside class="sidebar" >
+    <div class="sidebar-header">
+      <h2>Task Manager</h2>
+    </div>
+    <nav>
+    <ul>
+      <li><a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <i class="pi pi-home"></i>
+        <span>Dashboard</span>
+      </a></li>
+      <li><a routerLink="/tasks" routerLinkActive="active">
+        <i class="pi pi-list"></i>
+        <span> View All Tasks</span> 
+      </a></li>
+    </ul>
+    </nav>
+  </aside>
+<!--   
+</div> -->
+<!-- Main content -->
+<div class="main-content">
+  <!-- header -->
+  <div class="header">
+    <div class="header-content">
+      <h1>Dashboard</h1>
+      <div class="user-info">
+        <div class ="user-profile">
+        <i class="pi pi-shield user-icon"></i>
+        <span class="user-name">{{ authService.currentUser()?.name }}</span>
+        </div>
+        <button (click)="logout()" class="btn-logout">
+          <i class="pi pi-user user-icon"></i>
+        
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Dashboard content -->
+  <div class="dashboard-container">
+    <div class="stats-grid">
+      <div class="stat-card total">
+        <div class="stat-icon total-icon">
+             <i class="pi pi-list-check"></i>
+        </div>
+        <div class="stat-info">
+          <h3>Total Tasks</h3>
+          <p class="stat-number">{{ taskService.stats().total }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card pending">
+        <div class="stat-icon pending-icon">
+          <i class="pi pi-clock"></i>
+        </div>
+        <div class="stat-info">
+          <h3>Pending</h3>
+          <p class="stat-number">{{ taskService.stats().pending }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card progress">
+        <div class="stat-icon progress-icon">
+            <i class="pi pi-spinner pi-spin"></i>
+        </div>
+        <div class="stat-info">
+          <h3>In Progress</h3>
+          <p class="stat-number">{{ taskService.stats().inProgress }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card completed">
+        <div class="stat-icon completed-icon">
+              <i class="pi pi-check-circle"></i>
+
+        </div>
+        <div class="stat-info">
+          <h3>Completed</h3>
+          <p class="stat-number">{{ taskService.stats().completed }}</p>
+        </div>
+      </div>
+    </div>
+<!-- 
+    <div class="action-section">
+      <button (click)="navigateToTasks()" class="btn-view-tasks">
+        <i class="pi pi-eye"></i>
+        View All Tasks →
+      </button>
+    </div> -->
+
+
+
+
+    <!-- Recent task -->
+      <div class="recent-tasks-section">
+        <h2 >Recent Tasks</h2>
+        <br>
+        <br>
+        <div class="tasks-preview">
+          @if (recentTasks().length === 0) {
+            <div class="no-tasks">
+              <i class="pi pi-inbox"></i>
+              <p>No tasks yet. Create your first task!</p>
+            </div>
+          } @else {
+            @for (task of recentTasks(); track task.id) {
+              <div class="task-preview-card">
+                <div class="task-header">
+                  <h4>{{ task.title }}</h4>
+                  <span class="badge" [ngClass]="getPriorityClass(task.priority)">
+                    {{ task.priority }}
+                  </span>
+                </div>
+                <p class="task-description">{{ task.description || 'No description' }}</p>
+                <div class="task-footer">
+                  <span class="task-status" [ngClass]="getStatusClass(task.status)">
+                    {{ task.status }}
+                  </span>
+                  <span class="task-date">
+                    @if (task.dueDate) {
+                      {{ task.dueDate | date:'MMM dd, yyyy' }}
+                    } @else {
+                      No due date
+                    }
+                  </span>
+                </div>
+              </div>
+            }
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
